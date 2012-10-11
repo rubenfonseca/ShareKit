@@ -790,8 +790,37 @@ NSString* SHKLocalizedStringFormat(NSString* key)
 
 NSString* SHKLocalizedString(NSString* key, ...) 
 {
+	static NSString *NOT_FOUND_KEY = @"NOT_FOUND_KEY";
+	NSString *format;
+	
+	// 1: Search directly with SK and underscores
+	NSCharacterSet *toRemove = [NSCharacterSet characterSetWithCharactersInString:@".?!%@:"];
+	NSCharacterSet *toRemoveUnderscore = [NSCharacterSet characterSetWithCharactersInString:@".?!%@:_"];
+	
+	NSString *underscore_key = [key stringByReplacingOccurrencesOfString:@" " withString:@"_"];
+	NSString *sk_underscore_key = [@"SK_" stringByAppendingString:underscore_key];
+	sk_underscore_key = [[sk_underscore_key componentsSeparatedByCharactersInSet:toRemove] componentsJoinedByString:@""];
+	sk_underscore_key  = [sk_underscore_key stringByTrimmingCharactersInSet:toRemoveUnderscore];
+	
+	format = [[NSBundle mainBundle] localizedStringForKey:sk_underscore_key value:NOT_FOUND_KEY table:nil];
+	
+	// 2: search with underscores only
+	if([format isEqualToString:NOT_FOUND_KEY]) {
+		format = [[NSBundle mainBundle] localizedStringForKey:underscore_key value:NOT_FOUND_KEY table:nil];
+	}
+	
+	// 3: search with normal string
+	if([format isEqualToString:NOT_FOUND_KEY]) {
+		format = [[NSBundle mainBundle] localizedStringForKey:key value:NOT_FOUND_KEY table:nil];
+	}
+	
+	// 4: Search with Sharekit.Bundle
+	if([format isEqualToString:NOT_FOUND_KEY]) {
+		format = SHKLocalizedStringFormat(key);
+	}
+	
 	// Localize the format
-	NSString *localizedStringFormat = SHKLocalizedStringFormat(key);
+	NSString *localizedStringFormat = format;
 	
 	va_list args;
     va_start(args, key);
