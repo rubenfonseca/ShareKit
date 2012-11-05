@@ -499,7 +499,7 @@ static NSString *shareKitLibraryBundlePath = nil;
 {
     if (shareKitLibraryBundlePath == nil) {
         
-        shareKitLibraryBundlePath = [[[NSBundle mainBundle] pathForResource:@"ShareKit" ofType:@"bundle"] retain];
+        shareKitLibraryBundlePath = [[[NSBundle mainBundle] pathForResource:@"modules/com.0x82.sharekit/ShareKit" ofType:@"bundle"] retain];
     }
     return shareKitLibraryBundlePath;
 }
@@ -780,7 +780,7 @@ NSString* SHKLocalizedStringFormat(NSString* key)
 {
   static NSBundle* bundle = nil;
   if (nil == bundle) {
-    NSString* path = [[SHK shareKitLibraryBundlePath] stringByAppendingPathComponent:@"ShareKit.bundle"];
+    NSString* path = [SHK shareKitLibraryBundlePath];
     bundle = [[NSBundle bundleWithPath:path] retain];
     
     NSCAssert(bundle != nil,@"ShareKit has been refactored to be used as Xcode subproject. Please follow the updated installation wiki and re-add it to the project. Please do not forget to clean project and clean build folder afterwards");
