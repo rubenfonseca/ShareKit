@@ -6,3 +6,14 @@
     #import <Foundation/Foundation.h>
     #import <UIKit/UIKit.h>
 #endif
+
+#define FBRequest RFFBRequest
+#define Facebook RFFacebook
+#define FBLoginDialog RFFBLoginDialog
+#define FBDialog RFFBDialog
+#define FBFrictionlessRequestSettings RFFBFrictionlessRequestSettings
+
+#define EstimateBas64DecodedDataSize RFEstimateBas64DecodedDataSize
+#define Base64DecodeData RFBase64DecodeData
+
+#define Reachability RFReachability
