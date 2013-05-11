@@ -69,6 +69,16 @@
 	return [NSNumber numberWithBool:false];
 }
 
+/*
+ Create a project on Google APIs console,
+ https://code.google.com/apis/console . Under "API Access", create a
+ client ID as "Installed application" with the type "iOS", and
+ register the bundle ID of your application.
+ */
+- (NSString*)googlePlusClientId {
+    return @"651258972991.apps.googleusercontent.com";
+}
+
 // Read It Later - http://readitlaterlist.com/api/signup/ 
 - (NSString*)readItLaterKey {
 	return @"45aT6Vfvg66eWNebybd680gu13pdba3d";
@@ -198,6 +208,86 @@
 - (NSString*)foursquareV2RedirectURI {
     return @"app://foursquare";
 }
+
+// Tumblr - http://www.tumblr.com/docs/en/api/v2
+- (NSString*)tumblrConsumerKey {
+	return @"vT0GPbmG5pwWOLTyrFo6uG0UJQEfX4RgrnXY7ZTzkAJyCrHNPF";
+}
+// Plurk - http://www.plurk.com/API
+- (NSString *)plurkAppKey {
+  return @"orexUORVkR2C";
+}
+
+- (NSString*)tumblrSecret {
+	return @"XsYJPUNJDwCAw6B1PcmFjXuCLtgBp8chRrNuZhpLzn8gFBDg42";
+}
+
+- (NSString*)tumblrCallbackUrl {
+	return @"tumblr.sharekit.com";
+}
+
+// Hatena - https://www.hatena.com/yours12345/config/auth/develop
+- (NSString*)hatenaConsumerKey {
+	return @"rtu/vY4jfiA3DQ==";
+}
+
+- (NSString*)hatenaSecret {
+	return @"gFtqGv4/toRYlX/PT160+9fcrAU=";
+}
+
+- (NSString *)plurkAppSecret {
+  return @"YYQUAeAPY9YMcCP5ol0dB6epaaMFT10C";
+}
+
+- (NSString *)plurkCallbackURL {
+  return @"https://github.com/ShareKit/ShareKit";
+}
+
+// Dropbox - https://www.dropbox.com/developers/apps
+- (NSString *) dropboxAppKey {
+    return @"n18olaziz6f8752";
+}
+- (NSString *) dropboxAppSecret {
+    return @"6cjsemxx6i2qdvc";
+}
+
+/*
+ This setting should correspond with permission type set during your app registration with Dropbox. You can choose from these two values:
+ @"sandbox" (set if you chose permission type "App folder" == kDBRootAppFolder. You will have access only to the app folder you set in  https://www.dropbox.com/developers/apps)
+ @"dropbox" (set if you chose permission type "Full dropbox" == kDBRootDropbox)
+ */
+- (NSString *) dropboxRootFolder {
+    return @"dropbox";
+}
+-(BOOL)dropboxShouldOverwriteExistedFile {
+    return NO;
+}
+-(NSString *)youTubeConsumerKey
+{
+    return @"210716542944.apps.googleusercontent.com";
+}
+
+-(NSString *)youTubeSecret
+{
+    return @"aaHCtV3LhzFE6XSFcKobb7HU";
+}
+
+// Buffer
+/*
+ 1 - Set up an app at https://bufferapp.com/developers/apps/create
+ 2 - Once the app is set up this requires a URL Scheme to be set up within your apps info.plist. bufferXXXX where XXXX is your client ID, this will enable Buffer authentication.
+ */
+
+- (NSString*)bufferClientID
+{
+	return @"518cdcb0872cad4744000038";
+}
+
+- (NSString*)bufferClientSecret
+{
+	return @"1bf70db9032207624e2ad58fb24b1593";
+}
+
 
 /*
  UI Configuration : Basic
