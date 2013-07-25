@@ -76,13 +76,19 @@
  register the bundle ID of your application.
  */
 - (NSString*)googlePlusClientId {
-    return @"651258972991.apps.googleusercontent.com";
+    return @"210716542944-aq12sk8s1eit7msa4jsdtpci5121nrbv.apps.googleusercontent.com";
 }
 
-// Read It Later - http://readitlaterlist.com/api/signup/ 
-- (NSString*)readItLaterKey {
-	return @"45aT6Vfvg66eWNebybd680gu13pdba3d";
+//Pocket v3 consumer key. http://getpocket.com/developer/apps/. If you have old read it later app, you should obtain new key.
+- (NSString *)pocketConsumerKey {
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        return @"14225-bdc4f6b29cd76ce0603638e8";
+    } else {
+        return @"14225-3e2ae99c6fc078de5496577c";
+    }
 }
+
 // Diigo - http://diigo.com/api_dev
 -(NSString*)diigoKey {
   return @"f401ddc3546cdf3c";
@@ -276,7 +282,8 @@
 /*
  1 - Set up an app at https://bufferapp.com/developers/apps/create
  2 - Once the app is set up this requires a URL Scheme to be set up within your apps info.plist. bufferXXXX where XXXX is your client ID, this will enable Buffer authentication.
- */
+ 3 - Set bufferShouldShortenURLS. NO will use ShareKit's shortening (if available). YES will use Buffer's shortener once the sheet is autheorised and presented.
+*/
 
 - (NSString*)bufferClientID
 {
@@ -286,6 +293,10 @@
 - (NSString*)bufferClientSecret
 {
 	return @"1bf70db9032207624e2ad58fb24b1593";
+}
+
+-(BOOL)bufferShouldShortenURLS {
+    return YES;
 }
 
 

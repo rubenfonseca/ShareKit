@@ -1,9 +1,8 @@
 //
-//  SHKGoogleReader.h
+//  SHKPocket.h
 //  ShareKit
 //
-//  Created by Nathan Weiner on 6/20/10.
-
+//  Created by Vilém Kurz on 5/11/13.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +21,9 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
-//
-//
 
-#import <Foundation/Foundation.h>
 #import "SHKSharer.h"
 
-@interface SHKGoogleReader : SHKSharer 
-{
-	NSMutableDictionary *session;
-}
-
-@property (nonatomic, retain) NSMutableDictionary *session;
-
-- (void)sendWithToken:(NSString *)token;
-- (void)getSession:(NSString *)email password:(NSString *)password;
-- (void)signRequest:(SHKRequest *)aRequest;
+@interface SHKPocket : SHKSharer
 
 @end

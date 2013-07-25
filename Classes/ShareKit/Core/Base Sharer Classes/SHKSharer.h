@@ -26,8 +26,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SHK.h"
-#import "SHKFormController.h"
+
+#import "SHKItem.h"
+
+@class SHKRequest;
+@class SHKFormController;
+@class SHKFormOptionController;
+@class SHKFile;
 
 @class SHKSharer;
 
@@ -128,6 +133,11 @@ typedef enum
 
 // useful for handling custom posting error states
 + (void)clearSavedItem;
+
+#pragma mark - 
+#pragma mark - Share Item URL Shortening
+
+- (void)shortenURL;
 
 #pragma mark -
 #pragma mark Commit Share

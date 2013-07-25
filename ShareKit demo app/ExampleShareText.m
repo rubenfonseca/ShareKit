@@ -1,9 +1,8 @@
     //
-//  ExampleShareImage.m
+//  ExampleShareText.m
 //  ShareKit
 //
 //  Created by Nathan Weiner on 6/18/10.
-
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +22,17 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 //
-//
 
-#import "ExampleShareImage.h"
-#import "SHKItem.h"
-#import "SHKActionSheet.h"
+#import "ExampleShareText.h"
+#import "ShareKit.h"
 
-@interface ExampleShareImage ()
+@interface ExampleShareText ()
 
-@property (nonatomic, retain) UIImageView *imageView;
+@property (nonatomic, retain) UITextView *textView;
 
 @end
 
-@implementation ExampleShareImage
+@implementation ExampleShareText
 
 - (void)dealloc
 {
@@ -60,24 +57,26 @@
 {
 	[super loadView];
 	
-	self.imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"sanFran.jpg"]];
+	self.textView = [[UITextView alloc] initWithFrame:CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height)];
+	[self.view addSubview:self.textView];
 	
-	self.imageView.frame = CGRectMake(0,0,self.view.bounds.size.width,self.view.bounds.size.height);
-	
-	[self.view addSubview:self.imageView];
+	self.textView.text = @"This is a chunk of text.  If you highlight it, you'll be able to share the selection.  If you tap the share button below, it will share all of it.";
+	self.textView.editable = NO;
 }
 
 - (void)share
-{
-	SHKItem *item = [SHKItem image:self.imageView.image title:@"San Francisco"];
-    
-    /* optional examples
-    item.tags = [NSArray arrayWithObjects:@"bay bridge", @"architecture", @"california", nil];
-    
-    //give a source rect in the coords of the view set with setRootViewController:
-    item.popOverSourceRect = [self.navigationController.toolbar convertRect:self.navigationController.toolbar.bounds toView:self.view];
-     */
+{	
+	NSString *text;
+	
+	if (self.textView.selectedRange.length > 0)
+		text = [self.textView.text substringWithRange:self.textView.selectedRange];
+	
+	else
+		text = self.textView.text;
 
+	
+	SHKItem *item = [SHKItem text:text];
+    item.tags = [NSArray arrayWithObjects:@"sharekit", @"testing", @"text example", nil];
 	SHKActionSheet *actionSheet = [SHKActionSheet actionSheetForItem:item];
 	[SHK setRootViewController:self];
 	[actionSheet showFromToolbar:self.navigationController.toolbar];
@@ -87,5 +86,6 @@
 {
     return YES;
 }
+
 
 @end

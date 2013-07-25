@@ -26,12 +26,14 @@
 //
 //
 
-#import "SHKiOSFacebook.h"
 #import "SHKFacebook.h"
-#import <FacebookSDK.h>
-#import "SHKConfiguration.h"
+
+#import "SHKiOSFacebook.h"
 #import "NSMutableDictionary+NSNullsToEmptyStrings.h"
+#import "SharersCommonHeaders.h"
+
 #import <Social/Social.h>
+#import <FacebookSDK.h>
 
 static NSString *const kSHKFacebookUserInfo =@"kSHKFacebookUserInfo";
 static NSString *const kSHKFacebookVideoUploadLimits =@"kSHKFacebookVideoUploadLimits";
@@ -66,7 +68,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
     self = [super init];
     if (self) {
         self.pendingConnections = [[[NSMutableSet alloc] init] autorelease];
-		[FBSession setDefaultAppID:SHKCONFIG(facebookAppId)];
+		[FBSettings setDefaultAppID:SHKCONFIG(facebookAppId)];
     }
     return self;
 }
@@ -190,7 +192,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 
 + (BOOL)handleOpenURL:(NSURL*)url
 {
-	[FBSession setDefaultAppID:SHKCONFIG(facebookAppId)];
+	[FBSettings setDefaultAppID:SHKCONFIG(facebookAppId)];
 	//if app has "Application does not run in background" = YES, or was killed before it could return from Facebook SSO callback (from Safari or Facebook app)
 	if (authingSHKFacebook == nil &&
 		requestingPermisSHKFacebook == nil)
@@ -205,7 +207,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 
 + (void)handleWillTerminate
 {
-	[FBSession setDefaultAppID:SHKCONFIG(facebookAppId)];
+	[FBSettings setDefaultAppID:SHKCONFIG(facebookAppId)];
 	// if the app is going away, we close the session object; this is a good idea because
 	// things may be hanging off the session, that need releasing (completion block, etc.) and
 	// other components in the app may be awaiting close notification in order to do cleanup
@@ -214,7 +216,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 
 + (void)handleDidBecomeActive
 {
-	[FBSession setDefaultAppID:SHKCONFIG(facebookAppId)];
+	[FBSettings setDefaultAppID:SHKCONFIG(facebookAppId)];
 	// We need to properly handle activation of the application with regards to SSO
 	//  (e.g., returning from iOS 6.0 authorization dialog or from fast app switching).
 	[FBSession.activeSession handleDidBecomeActive];
@@ -298,7 +300,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 + (void)logout
 {
 	[SHKFacebook clearSavedItem];
-	[FBSession setDefaultAppID:SHKCONFIG(facebookAppId)];
+	[FBSettings setDefaultAppID:SHKCONFIG(facebookAppId)];
 	[FBSession.activeSession closeAndClearTokenInformation];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kSHKFacebookUserInfo];
 }
@@ -416,12 +418,15 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 	
 	if (self.item.shareType == SHKShareTypeURL || self.item.shareType == SHKShareTypeText)
 	{
-		NSString *url = [self.item.URL absoluteString];
-		[params setObject:url forKey:@"link"];
-		[params setObject:self.item.title == nil ? url : self.item.title
-				   forKey:@"name"];
-		
-		//message parameter is invalid in fbdialog since 2011. Next two lines are effective only when sending to graph API.
+        if (self.item.URL) {
+            NSString *url = [self.item.URL absoluteString];
+            [params setObject:url forKey:@"link"];
+        }
+        
+        if (self.item.title) {
+            [params setObject:self.item.title forKey:@"name"];
+        }
+
 		if (self.item.text)
 			[params setObject:self.item.text forKey:@"message"];
 		
@@ -521,7 +526,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
             [[NSUserDefaults standardUserDefaults] setObject:result forKey:kSHKFacebookVideoUploadLimits];
             
             // Check video size
-            NSUInteger maxVideoSize = result[@"video_upload_limits"][@"size"];
+            NSUInteger maxVideoSize = [result[@"video_upload_limits"][@"size"] unsignedIntegerValue];
             BOOL isUnderSize = maxVideoSize >= self.item.file.size;
             if(!isUnderSize){
                 completionBlock([[NSError errorWithDomain:@"video_upload_limits" code:200 userInfo:@{
@@ -597,35 +602,35 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 #pragma mark - UI Implementation
 - (void) doNativeShow
 {
-	BOOL displayedNativeDialog = [FBNativeDialogs presentShareDialogModallyFrom:[[SHK currentHelper] rootViewForUIDisplay]
-																	initialText:self.item.text ? self.item.text : self.item.title
-																		  image:self.item.image
-																			url:self.item.URL
-																		handler:^(FBNativeDialogResult result, NSError *error) {
-																			if (error) {
-																				/* handle failure */
-																				//check if user revoked app permissions
-																				NSDictionary *response = [error.userInfo valueForKey:FBErrorParsedJSONResponseKey];
-																				
-																				if ([error.domain isEqualToString:FacebookSDKDomain] &&
-																					[[[[response objectForKey:@"body"] objectForKey:@"error"] objectForKey:@"code"] intValue] == 190) {
-																					[FBSession.activeSession closeAndClearTokenInformation];
-																					[self shouldReloginWithPendingAction:SHKPendingShare];
-																				} else {
-																					[self sendDidFailWithError:error];
-																					[FBSession.activeSession close];	// unhook us
-																				}
-																			} else {
-																				if (result == FBNativeDialogResultSucceeded) {
-																					/* handle success */
-																					[self sendDidFinish];
-																					[FBSession.activeSession close];	// unhook us
-																				} else {
-																					/* handle user cancel */
-																					[self sendDidCancel];
-																				}
-																			}
-																		}];
+	BOOL displayedNativeDialog = [FBDialogs presentOSIntegratedShareDialogModallyFrom:[[SHK currentHelper] rootViewForUIDisplay]
+                                                                          initialText:self.item.text ? self.item.text : self.item.title
+                                                                                image:self.item.image
+                                                                                  url:self.item.URL
+                                                                              handler:^(FBOSIntegratedShareDialogResult result, NSError *error) {
+                                                                                  if (error) {
+                                                                                      /* handle failure */
+                                                                                      //check if user revoked app permissions
+                                                                                      NSDictionary *response = [error.userInfo valueForKey:FBErrorParsedJSONResponseKey];
+                                                                                      
+                                                                                      if ([error.domain isEqualToString:FacebookSDKDomain] &&
+                                                                                          [[[[response objectForKey:@"body"] objectForKey:@"error"] objectForKey:@"code"] intValue] == 190) {
+                                                                                          [FBSession.activeSession closeAndClearTokenInformation];
+                                                                                          [self shouldReloginWithPendingAction:SHKPendingShare];
+                                                                                      } else {
+                                                                                          [self sendDidFailWithError:error];
+                                                                                          [FBSession.activeSession close];	// unhook us
+                                                                                      }
+                                                                                  } else {
+                                                                                      if (result == FBNativeDialogResultSucceeded) {
+                                                                                          /* handle success */
+                                                                                          [self sendDidFinish];
+                                                                                          [FBSession.activeSession close];	// unhook us
+                                                                                      } else {
+                                                                                          /* handle user cancel */
+                                                                                          [self sendDidCancel];
+                                                                                      }
+                                                                                  }
+                                                                              }];
 	if (!displayedNativeDialog) {
 		[self doSHKShow];
 	}
@@ -645,7 +650,7 @@ static SHKFacebook *requestingPermisSHKFacebook=nil;
 
 - (void)show
 {
-	BOOL tryToPresent = ![SHKCONFIG(forcePreIOS6FacebookPosting) boolValue] && [FBNativeDialogs canPresentShareDialogWithSession:[FBSession activeSession]];
+	BOOL tryToPresent = ![SHKCONFIG(forcePreIOS6FacebookPosting) boolValue] && [FBDialogs canPresentOSIntegratedShareDialogWithSession:[FBSession activeSession]];
 	if(tryToPresent){	// if there's a shot
 		if ([FBSession.activeSession.permissions
 			 indexOfObject:@"publish_actions"] == NSNotFound) {	// we need at least this.SHKCONFIG(facebookWritePermissions

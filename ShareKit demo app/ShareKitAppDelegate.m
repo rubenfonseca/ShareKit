@@ -11,12 +11,14 @@
 
 #import "SHKDropbox.h"
 #import "SHKGooglePlus.h"
-#import "SHKReadItLater.h"
 #import "SHKFacebook.h"
 #import "EvernoteSDK.h"
 #import "SHKBuffer.h"
+#import "PocketAPI.h"
 #import "SHKConfiguration.h"
 #import "ShareKitDemoConfigurator.h"
+#import "SHK.h"
+
 
 @implementation ShareKitAppDelegate
 
@@ -69,9 +71,13 @@
 {
     NSString* scheme = [url scheme];
     
+    NSRange pocketPrefixKeyRange = [(NSString *)SHKCONFIG(pocketConsumerKey) rangeOfString:@"-"];
+    NSRange range = {0, pocketPrefixKeyRange.location - 1};
+    NSString *pocketPrefixKeyPart = [(NSString *)SHKCONFIG(pocketConsumerKey) substringWithRange:range];
+
     if ([scheme hasPrefix:[NSString stringWithFormat:@"fb%@", SHKCONFIG(facebookAppId)]]) {
         return [SHKFacebook handleOpenURL:url];
-    } else if ([scheme isEqualToString:@"com.yourcompany.sharekitdemo"]) {
+    } else if ([scheme isEqualToString:@"com.cocoaminers.ShareKit-demo-app"]) {
         return [SHKGooglePlus handleURL:url sourceApplication:sourceApplication annotation:annotation];
     } else if ([scheme hasPrefix:[NSString stringWithFormat:@"db-%@", SHKCONFIG(dropboxAppKey)]]) {
         return [SHKDropbox handleOpenURL:url];
@@ -79,7 +85,10 @@
         return [[EvernoteSession sharedSession] canHandleOpenURL:url];
     } else if ([scheme hasPrefix:[NSString stringWithFormat:@"buffer%@", SHKCONFIG(bufferClientID)]]) {
         return [SHKBuffer handleOpenURL:url];
+    }else if ([scheme hasPrefix:[NSString stringWithFormat:@"pocketapp%@", pocketPrefixKeyPart]]) {
+        return [[PocketAPI sharedAPI] handleOpenURL:url];
     }
+
     
     return YES;
 }
